@@ -74,7 +74,7 @@ fileprivate extension AMServiceProvider {
     
     func log(message: String) {
         if enabledLogging {
-            os_log("@", message)
+            os_log("%@", message)
         }
     }
     

@@ -20,7 +20,7 @@ open class AMJSONResponseSerializer: AFJSONResponseSerializer {
     }
     
     open override func responseObject(for response: URLResponse?, data: Data?, error: NSErrorPointer) -> Any? {
-        let object = responseObject(for: response, data: data, error: error)
+        let object = super.responseObject(for: response, data: data, error: error)
         
         if let pointer = error, let err = pointer.pointee, err.domain == AFURLResponseSerializationErrorDomain && err.code == NSURLErrorCannotDecodeContentData {
             pointer.pointee = nil
