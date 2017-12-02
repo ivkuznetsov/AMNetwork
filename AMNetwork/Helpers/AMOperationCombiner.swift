@@ -72,10 +72,10 @@ public final class AMOperationCombiner {
         
         if blocks == nil {
             blocks = []
-            dict[key] = blocks!
         }
-        if let block = block, var blocks = blocks, blocks.contains(where: { $0 === block }) {
-            blocks.append(block)
+        if let block = block, let innerBlocks = blocks, !innerBlocks.contains(where: { $0 === block }) {
+            blocks?.append(block)
         }
+        dict[key] = blocks!
     }
 }
