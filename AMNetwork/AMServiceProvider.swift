@@ -18,10 +18,10 @@ open class AMServiceProvider : AFHTTPSessionManager {
     public var authorizationToken: String?
     public var enabledLogging: Bool = true
     
-    private var loginProcess: ((RequestCompletion)->())?
+    private var loginProcess: ((@escaping RequestCompletion)->())?
     
     public init(baseURL url: URL,
-                        loginProcess: ((RequestCompletion)->())?,
+                        loginProcess: ((@escaping RequestCompletion)->())?,
                         requestSerializer: AFHTTPRequestSerializer,
                         responseSerializer: AFHTTPResponseSerializer) {
         
@@ -31,7 +31,7 @@ open class AMServiceProvider : AFHTTPSessionManager {
         self.responseSerializer = responseSerializer
     }
     
-    public convenience init(baseURL url: URL, loginProcess: ((RequestCompletion)->())?) {
+    public convenience init(baseURL url: URL, loginProcess: ((@escaping RequestCompletion)->())?) {
         self.init(baseURL: url, loginProcess: loginProcess, requestSerializer:AFJSONRequestSerializer(), responseSerializer: AMJSONResponseSerializer())
     }
     
