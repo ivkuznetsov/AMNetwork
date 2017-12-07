@@ -8,17 +8,13 @@
 
 import Foundation
 
-open class AMRequestError : LocalizedError {
+@objc open class AMRequestError: NSError {
     
-    public var errorDescription : String?
-    public var code: Int
-    
-    init(code: Int) {
-        self.code = code;
+    @objc public init(code: Int, description: String) {
+        super.init(domain: "amnetwork.com", code: code, userInfo: [NSLocalizedDescriptionKey : description])
     }
     
-    public convenience init(code: Int, description: String) {
-        self.init(code: code)
-        self.errorDescription = description
+    public required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

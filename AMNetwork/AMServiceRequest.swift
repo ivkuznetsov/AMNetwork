@@ -8,55 +8,49 @@
 
 import Foundation
 
-open class AMServiceRequest {
+@objc public protocol AMServiceRequest {
     
-    public init() {
-        
+    func acceptableContentType() -> String
+    
+    func method() -> String
+    
+    func path() -> String
+    
+    func requestDictionary() -> [String : Any]?
+    
+    func process(response: Any)
+    
+    func canAskLogin() -> Bool
+}
+
+@objc public protocol RequestReusing {
+    
+    func reuseId() -> String?
+}
+
+@objc public protocol RequestErrorConverting {
+    
+    func convert(responseError: Error) -> Error?
+    
+    func validate(response: Any?, httpResponse: HTTPURLResponse) -> Error?
+}
+
+@objc public protocol RequestCustomizing {
+    
+    func requestWillSend(_ request: NSMutableURLRequest)
+}
+
+extension AMServiceRequest {
+    
+    func reusing() -> RequestReusing? {
+        return self as? RequestReusing
     }
     
-    open func acceptableContentType() -> String? {
-        return "application/json"
+    func errorConverting() -> RequestErrorConverting? {
+        return self as? RequestErrorConverting
     }
     
-    open func method() -> String {
-        return "POST"
-    }
-    
-    open func path() -> String {
-        return "(request_path_here)"
-    }
-    
-    open func requestDictionary() -> [String : Any] {
-        return [:]
-    }
-    
-    open func process(response: Any) {
-        
-    }
-    
-    open func reuseId() -> String? {
-        return nil
-    }
-    
-    open func canAskLogin() -> Bool {
-        return true
-    }
-    
-    open func requestWillSend(request: inout URLRequest) {
-        
-    }
-    
-    open func convert(responseError: Error) -> Error {
-        return responseError
-    }
-    
-    open func validate(response: Any?, httpResponse: HTTPURLResponse) -> AMRequestError? {
-        
-        let acceptableCodes = IndexSet(integersIn: 200..<301)
-        
-        if !acceptableCodes.contains(httpResponse.statusCode) {
-            return AMRequestError(code: httpResponse.statusCode, description: "Some server error occured")
-        }
-        return nil
+    func customizing() -> RequestCustomizing? {
+        return self as? RequestCustomizing
     }
 }

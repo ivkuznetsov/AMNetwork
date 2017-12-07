@@ -9,19 +9,19 @@
 import Foundation
 import os.log
 
-public typealias RequestCompletion = (Any?, Error?) -> ()
+public typealias ProcessLogin = (Error?) -> ()
 public typealias RequestProgress = (Double) -> ()
 
-open class AMServiceProvider : AFHTTPSessionManager {
+@objc open class AMServiceProvider : AFHTTPSessionManager {
     
     public var responserKey: String?
     public var authorizationToken: String?
-    public var enabledLogging: Bool = true
+    @objc public var enabledLogging: Bool = true
     
-    private var loginProcess: ((@escaping RequestCompletion)->())?
+    private var loginProcess: ((@escaping ProcessLogin)->())?
     
-    public init(baseURL url: URL,
-                        loginProcess: ((@escaping RequestCompletion)->())?,
+    @objc public init(baseURL url: URL,
+                        loginProcess: ((@escaping (Error?)->())->())?,
                         requestSerializer: AFHTTPRequestSerializer,
                         responseSerializer: AFHTTPResponseSerializer) {
         
@@ -31,7 +31,7 @@ open class AMServiceProvider : AFHTTPSessionManager {
         self.responseSerializer = responseSerializer
     }
     
-    public convenience init(baseURL url: URL, loginProcess: ((@escaping RequestCompletion)->())?) {
+    @objc public convenience init(baseURL url: URL, loginProcess: ((@escaping ProcessLogin)->())?) {
         self.init(baseURL: url, loginProcess: loginProcess, requestSerializer:AFJSONRequestSerializer(), responseSerializer: AMJSONResponseSerializer())
     }
     
@@ -39,7 +39,7 @@ open class AMServiceProvider : AFHTTPSessionManager {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func send(_ request: AMServiceRequest) -> URLSessionDataTask? {
+    @objc public func send(_ request: AMServiceRequest) -> URLSessionDataTask? {
         return internalSend(request, progress: nil, completion: nil) as? URLSessionDataTask
     }
         
@@ -47,11 +47,11 @@ open class AMServiceProvider : AFHTTPSessionManager {
         return internalSend(request, progress: nil, completion: completion) as? URLSessionDataTask
     }
     
-    public func uploadFile<T: AMFileRequest>(_ request: T, progress: RequestProgress?, completion: ((T, Error?)->())?) -> URLSessionUploadTask? {
+    public func upload<T: AMFileRequest>(_ request: T, progress: RequestProgress?, completion: ((T, Error?)->())?) -> URLSessionUploadTask? {
         return internalSend(request, progress: progress, completion: completion) as? URLSessionUploadTask
     }
     
-    public func downloadFile<T: AMFileRequest>(_ request: T, progress: RequestProgress?, completion: ((T, Error?)->())?) -> URLSessionDownloadTask? {
+    public func download<T: AMFileRequest>(_ request: T, progress: RequestProgress?, completion: ((T, Error?)->())?) -> URLSessionDownloadTask? {
         return internalSend(request, progress: progress, completion: completion) as? URLSessionDownloadTask
     }
     
@@ -60,7 +60,7 @@ open class AMServiceProvider : AFHTTPSessionManager {
         return error.code == AMHTTPStatusCodes.HTTP_UNAUTORIZED.rawValue
     }
     
-    open func requestWillSend(_ request: inout URLRequest, serviceRequest: AMServiceRequest) {
+    open func requestWillSend(_ request: NSMutableURLRequest, serviceRequest: AMServiceRequest) {
         let requestId = UUID().uuidString
         request.setValue(requestId, forHTTPHeaderField: "X-Request-id")
         if let token = authorizationToken {
@@ -70,51 +70,74 @@ open class AMServiceProvider : AFHTTPSessionManager {
     }
 }
 
+@available(swift, obsoleted: 1.0)
+public extension AMServiceProvider {
+    
+    @objc public func send(_ request: AMServiceRequest, completion: @escaping (AMServiceRequest, Error?)->()) -> URLSessionDataTask? {
+        return sendWith(request, completion: completion)
+    }
+    
+    @objc public func uploadFile(_ request: AMFileUpload, progress: RequestProgress?, completion: ((AMFileUpload, Error?)->())?) -> URLSessionUploadTask? {
+        return upload(request, progress: progress, completion: completion)
+    }
+    
+    @objc public func downloadFile(_ request: AMFileRequest, progress: RequestProgress?, completion: ((AMFileRequest, Error?)->())?) -> URLSessionDownloadTask? {
+        return download(request, progress: progress, completion: completion)
+    }
+}
+
 fileprivate extension AMServiceProvider {
     
     func log(message: String) {
         if enabledLogging {
-            os_log("%@", message)
+            if #available(iOS 10.0, *) {
+                os_log("%@", message)
+            } else {
+                print(message)
+            }
         }
     }
     
     func internalSend<T: AMServiceRequest>(_ originalRequest: T, progress: RequestProgress?, completion: ((T, Error?)->())?) -> URLSessionTask? {
-        return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
-            
-            if let error = error as? AMRequestError, self.isFailedAuthorization(innerRequest, error: error) {
-                
-                _ = AMOperationCombiner.run(block: { (completion, _) -> AnyObject? in
-                    
-                    if let loginProcess = self.loginProcess {
-                        loginProcess(completion)
-                    } else {
-                        completion(nil, error)
-                    }
-                    return nil
-                    
-                }, completion: { (request, error) in
-                    
-                    if error == nil {
-                        _ = self.internalSend(innerRequest, progress: progress, completion: completion)
-                    } else {
-                        completion?(innerRequest, error)
-                    }
-                    
-                }, progress: nil, key: "AMServiceProviderInnerRelogin")
-                
-            } else {
-                completion?(innerRequest, error)
-            }
-            
-        })
+        return AMOperationCombiner.run(type(of: originalRequest),
+                                       key: originalRequest.reusing()?.reuseId(),
+                                       completion: completion,
+                                       progress: progress) { (completion, progress) -> AnyObject? in
+                                        
+                                        return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
+                                            
+                                            if let error = error as? AMRequestError, let loginProcess = self.loginProcess, self.isFailedAuthorization(innerRequest, error: error) {
+                                                
+                                                _ = AMOperationCombiner.run(type(of: innerRequest),
+                                                                            key: "AMServiceProviderInnerRelogin",
+                                                                            completion: { (request, error) in
+                                                                                
+                                                                                if error == nil {
+                                                                                    _ = self.enque(innerRequest, progress: progress, completion: completion)
+                                                                                } else {
+                                                                                    completion(innerRequest, error)
+                                                                                }
+                                                                                
+                                                }, progress: nil) { (completion, _) -> AnyObject? in
+                                                    loginProcess({ (error) in
+                                                        completion(innerRequest, error)
+                                                    })
+                                                    return nil
+                                                }
+                                                
+                                            } else {
+                                                completion(innerRequest, error)
+                                            }
+                                        })
+        } as? URLSessionTask
     }
     
-    func requestFor(_ serviceRequest: AMServiceRequest) throws -> URLRequest {
+    func requestFor(_ serviceRequest: AMServiceRequest) throws -> NSMutableURLRequest {
         var error: NSError?
         
         var request: NSMutableURLRequest?
         
-        if let fileRequest = serviceRequest as? AMFileRequest, fileRequest.isUpload {
+        if let fileRequest = serviceRequest as? AMFileUpload {
             request = requestSerializer.multipartFormRequest(withMethod: fileRequest.method(),
                                                              urlString: URL(string: fileRequest.path(), relativeTo: baseURL)!.absoluteString,
                                                              parameters: fileRequest.requestDictionary(),
@@ -147,22 +170,20 @@ fileprivate extension AMServiceProvider {
         if request == nil {
             throw AMRequestError(code: 0, description: "Cannot send request")
         }
-        return request! as URLRequest
+        return request!
     }
     
     func enque<T: AMServiceRequest>(_ request: T, progress:RequestProgress?, completion: @escaping (T, Error?)->()) -> URLSessionTask? {
         
         var task: URLSessionTask?
-        var urlRequest: URLRequest
+        var urlRequest: NSMutableURLRequest
         
         do {
             urlRequest = try requestFor(request)
-            
-            if let contentType = request.acceptableContentType() {
-                urlRequest.setValue(contentType, forHTTPHeaderField: "Accept")
-            }
-            requestWillSend(&urlRequest, serviceRequest: request)
-            request.requestWillSend(request: &urlRequest)
+            urlRequest.setValue(request.acceptableContentType(), forHTTPHeaderField: "Accept")
+
+            requestWillSend(urlRequest, serviceRequest: request)
+            request.customizing()?.requestWillSend(urlRequest)
             
             if let fileRequest = request as? AMFileRequest {
                 
@@ -172,9 +193,9 @@ fileprivate extension AMServiceProvider {
                     }
                 }
                 
-                if fileRequest.isUpload {
+                if fileRequest as? AMFileUpload != nil {
                     
-                    task = uploadTask(withStreamedRequest: urlRequest, progress: updateProgress, completionHandler: { (response, object, error) in
+                    task = uploadTask(withStreamedRequest: urlRequest as URLRequest, progress: updateProgress, completionHandler: { (response, object, error) in
                         let httpResponse = response as! HTTPURLResponse
                         self.process(response: httpResponse, object: object, error: error, request: request, completion: completion)
                     })
@@ -182,7 +203,7 @@ fileprivate extension AMServiceProvider {
                     
                     if let filePath = fileRequest.filePath() {
                         
-                        task = downloadTask(with: urlRequest, progress: updateProgress, destination: { (targetURL, _) -> URL in
+                        task = downloadTask(with: urlRequest as URLRequest, progress: updateProgress, destination: { (targetURL, _) -> URL in
                             return URL(fileURLWithPath: filePath)
                         }, completionHandler: { (response, url, error) in
                             
@@ -191,7 +212,7 @@ fileprivate extension AMServiceProvider {
                         })
                         
                     } else {
-                        task = dataTask(with: urlRequest, uploadProgress: nil, downloadProgress: updateProgress, completionHandler: { (response, object, error) in
+                        task = dataTask(with: urlRequest as URLRequest, uploadProgress: nil, downloadProgress: updateProgress, completionHandler: { (response, object, error) in
                         
                             if error == nil, let data = object as? Data {
                                 fileRequest.fileData = data
@@ -203,7 +224,7 @@ fileprivate extension AMServiceProvider {
                 }
             } else {
                 
-                task = dataTask(with: urlRequest, uploadProgress: nil, downloadProgress: nil, completionHandler: { (response, object, error) in
+                task = dataTask(with: urlRequest as URLRequest, uploadProgress: nil, downloadProgress: nil, completionHandler: { (response, object, error) in
                     
                     let httpResponse = response as! HTTPURLResponse
                     self.process(response: httpResponse, object: object, error: error, request: request, completion: completion)
@@ -215,8 +236,10 @@ fileprivate extension AMServiceProvider {
             return nil
         }
         
-        log(message: "request url: \(String(describing: urlRequest.url?.absoluteString))")
-        log(message: "request headers: \(String(describing: urlRequest.allHTTPHeaderFields))")
+        log(message: "request url: \(urlRequest.url!.absoluteString)")
+        if let headers = urlRequest.allHTTPHeaderFields {
+            log(message: "request headers: \(headers.json()))")
+        }
         
         if let body = urlRequest.httpBody, request as? AMFileRequest == nil {
             log(message: "request body: \(String(data:body, encoding:String.Encoding(rawValue: requestSerializer.stringEncoding)) ?? "Cannot parse body")")
@@ -230,19 +253,23 @@ fileprivate extension AMServiceProvider {
     func process<T: AMServiceRequest>(response: HTTPURLResponse, object: Any?, error: Error?, request: T, completion: @escaping (T, Error?)->()) {
         
         log(message: "response code: \(response.statusCode)")
-        log(message: "response headers: \(response.allHeaderFields)")
+        log(message: "response headers: \(response.allHeaderFields.json())")
         
         var resultError = error
         
-        if resultError == nil {
-            resultError = request.validate(response: object, httpResponse: response)
+        if let contentType = response.allHeaderFields["Content-Type"] as? String, !contentType.contains(request.acceptableContentType()) {
+            resultError = AMRequestError(code: NSURLErrorBadServerResponse, description: "Incorrect answer from service")
+        }
+        
+        if let converting = request.errorConverting(), resultError == nil {
+            resultError = converting.validate(response: object, httpResponse: response)
         }
         
         if let mime = response.mimeType, mime.hasPrefix("application") || mime.hasPrefix("text") {
             if let object = object as? [AnyHashable : Any] {
-                log(message: "Response body: \(object)")
+                log(message: "Response body: \(object.json())")
             } else if let object = object as? [Any] {
-                log(message: "Response body: \(object)")
+                log(message: "Response body: \(object.json())")
             } else if let object = object as? Data {
                 log(message: "Response body: \(String(data:object, encoding:String.Encoding(rawValue: requestSerializer.stringEncoding)) ?? "Cannot parse body")")
             }
@@ -251,7 +278,9 @@ fileprivate extension AMServiceProvider {
         if let error = resultError {
             log(message: "request error: \(error.localizedDescription)")
             
-            resultError = request.convert(responseError: error)
+            if let converting = request.errorConverting() {
+                resultError = converting.convert(responseError: error)
+            }
             
             completion(request, resultError)
             return

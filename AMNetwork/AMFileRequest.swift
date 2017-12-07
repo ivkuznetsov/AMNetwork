@@ -8,27 +8,18 @@
 
 import Foundation
 
-open class AMFileRequest: AMServiceRequest {
+@objc public protocol AMFileRequest: AMServiceRequest {
     
-    public var isUpload: Bool = true
+    func filePath() -> String?
     
     //if filePath returns nil, all data should be here
-    public var fileData: Data?
-    public var fileName: String?
+    var fileData: Data? { get set }
+    var fileName: String? { get set }
+}
+
+@objc public protocol AMFileUpload: AMFileRequest {
     
-    open func filePath() -> String? {
-        return nil
-    }
+    func mimeType() -> String
     
-    open func mimeType() -> String {
-        return "application/octet-stream"
-    }
-    
-    open override func acceptableContentType() -> String? {
-        return isUpload ? super.acceptableContentType() : nil
-    }
-    
-    open func formFileField() -> String {
-        return "data[file]"
-    }
+    func formFileField() -> String
 }

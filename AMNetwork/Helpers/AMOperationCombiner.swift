@@ -8,13 +8,15 @@
 
 import Foundation
 
+public typealias RequestCompletion<T> = (T, Error?)->()
+
 public final class AMOperationCombiner {
     
     private static let shared = AMOperationCombiner()
     
     private var processingRequests: [String : [String : [AnyObject]]] = [:]
     
-    public class func run(block: (@escaping RequestCompletion, @escaping RequestProgress) -> AnyObject?, completion: RequestCompletion?, progress: RequestProgress?, key: String?) -> AnyObject? {
+    public class func run<T>(_ type: T.Type, key: String?, completion: RequestCompletion<T>?, progress: RequestProgress?, closure: (@escaping RequestCompletion<T>, @escaping RequestProgress) -> AnyObject?) -> AnyObject? {
         
         if let key = key {
         
@@ -31,11 +33,11 @@ public final class AMOperationCombiner {
             insertBlock(block: progress as AnyObject?, dict: &dict!, key: "progress")
             self.shared.processingRequests[key] = dict
             
-            let operation = block({ (object, error) in
+            let operation = closure({ (object, error) in
                 
                 if let dict = shared.processingRequests[key], let blocks = dict["completion"] {
                     blocks.forEach {
-                        if let block = $0 as? RequestCompletion {
+                        if let block = $0 as? RequestCompletion<T> {
                             block(object, error)
                         }
                     }
@@ -59,7 +61,7 @@ public final class AMOperationCombiner {
             
             return operation
         } else {
-            return block({ (object, error) in
+            return closure({ (object, error) in
                 completion?(object, error)
             }, { (progressValue) in
                 progress?(progressValue)
