@@ -139,11 +139,11 @@ fileprivate extension AMServiceProvider {
         
         if let fileRequest = serviceRequest as? AMFileUpload {
             request = requestSerializer.multipartFormRequest(withMethod: fileRequest.method(),
-                                                             urlString: URL(string: fileRequest.path(), relativeTo: baseURL)!.absoluteString,
+                                                             urlString: URL(string: fileRequest.path(), relativeTo: baseURL)?.absoluteString ?? baseURL!.absoluteString,
                                                              parameters: fileRequest.requestDictionary(),
                                                              constructingBodyWith: { (formData) in
                                                             
-                                                                if let path = fileRequest.filePath() {
+                                                                if let path = fileRequest.filePath(), path.count > 0 {
                                                                 
                                                                     try? formData.appendPart(withFileURL: URL(fileURLWithPath: path),
                                                                                              name: fileRequest.formFileField())
