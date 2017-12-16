@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AFNetworking
 
 open class AMJSONResponseSerializer: AFJSONResponseSerializer {
     

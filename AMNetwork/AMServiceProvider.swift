@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AFNetworking
 import os.log
 
 public typealias ProcessLogin = (Error?) -> ()
