@@ -220,7 +220,6 @@
 				D79499431FC480F2000D2C4F /* Sources */,
 				D79499441FC480F2000D2C4F /* Frameworks */,
 				D79499451FC480F2000D2C4F /* Headers */,
-				D79499461FC480F2000D2C4F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -347,13 +346,6 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D79499461FC480F2000D2C4F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D794994F1FC480F2000D2C4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;

@@ -22,14 +22,23 @@ public final class AMOperationCombiner {
         
             var dict = self.shared.processingRequests[key]
             
+            var wrappedCompletion: ((Any, Error?)->())?
+            
+            if let completion = completion {
+                wrappedCompletion = { (request, error) in
+                    completion(request as! T, error)
+                }
+            }
+            
             if var dict = dict {
-                insertBlock(block: completion as AnyObject?, dict: &dict, key: "completion")
+                insertBlock(block: wrappedCompletion as AnyObject?, dict: &dict, key: "completion")
                 insertBlock(block: progress as AnyObject?, dict: &dict , key: "progress")
+                self.shared.processingRequests[key] = dict
                 return dict["operation"]?.first
             }
             
             dict = [:]
-            insertBlock(block: completion as AnyObject?, dict: &dict!, key: "completion")
+            insertBlock(block: wrappedCompletion as AnyObject?, dict: &dict!, key: "completion")
             insertBlock(block: progress as AnyObject?, dict: &dict!, key: "progress")
             self.shared.processingRequests[key] = dict
             
@@ -37,7 +46,7 @@ public final class AMOperationCombiner {
                 
                 if let dict = shared.processingRequests[key], let blocks = dict["completion"] {
                     blocks.forEach {
-                        if let block = $0 as? RequestCompletion<T> {
+                        if let block = $0 as? (Any, Error?)->() {
                             block(object, error)
                         }
                     }
@@ -70,14 +79,11 @@ public final class AMOperationCombiner {
     }
     
     private class func insertBlock(block: AnyObject?, dict: inout [String : [AnyObject]], key: String) {
-        var blocks = dict[key]
+        var blocks = dict[key] ?? []
         
-        if blocks == nil {
-            blocks = []
+        if let block = block {
+            blocks.append(block)
         }
-        if let block = block, let innerBlocks = blocks, !innerBlocks.contains(where: { $0 === block }) {
-            blocks?.append(block)
-        }
-        dict[key] = blocks!
+        dict[key] = blocks
     }
 }
