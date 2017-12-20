@@ -258,10 +258,6 @@ fileprivate extension AMServiceProvider {
         
         var resultError = error
         
-        if let contentType = response.allHeaderFields["Content-Type"] as? String, !contentType.contains(request.acceptableContentType()) {
-            resultError = AMRequestError(code: NSURLErrorBadServerResponse, description: "Incorrect answer from service")
-        }
-        
         if let converting = request.errorConverting(), resultError == nil {
             resultError = converting.validate(response: object, httpResponse: response)
         }
