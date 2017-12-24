@@ -80,13 +80,6 @@
 			remoteGlobalIDString = 2987B0AE1BC408A200179A4C;
 			remoteInfo = "AFNetworking tvOS Tests";
 		};
-		D7CB5CE21FE5ABF300341E60 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D7CB5CCA1FE5ABD700341E60 /* AFNetworking.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 299522381BBF104D00859F49;
-			remoteInfo = "AFNetworking iOS";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -227,12 +220,10 @@
 				D79499431FC480F2000D2C4F /* Sources */,
 				D79499441FC480F2000D2C4F /* Frameworks */,
 				D79499451FC480F2000D2C4F /* Headers */,
-				D79499461FC480F2000D2C4F /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				D7CB5CE31FE5ABF300341E60 /* PBXTargetDependency */,
 			);
 			name = AMNetwork;
 			productName = AMNetwork;
@@ -355,13 +346,6 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D79499461FC480F2000D2C4F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		D794994F1FC480F2000D2C4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -404,11 +388,6 @@
 			isa = PBXTargetDependency;
 			target = D79499471FC480F2000D2C4F /* AMNetwork */;
 			targetProxy = D79499531FC480F2000D2C4F /* PBXContainerItemProxy */;
-		};
-		D7CB5CE31FE5ABF300341E60 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "AFNetworking iOS";
-			targetProxy = D7CB5CE21FE5ABF300341E60 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
