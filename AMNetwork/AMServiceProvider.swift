@@ -107,7 +107,7 @@ fileprivate extension AMServiceProvider {
                                         
                                         return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
                                             
-                                            if let error = error as? AMRequestError, let loginProcess = self.loginProcess, self.isFailedAuthorization(innerRequest, error: error) {
+                                            if let error = error as? AMRequestError, let loginProcess = self.loginProcess, self.isFailedAuthorization(innerRequest, error: error) && originalRequest.canAskLogin() {
                                                 
                                                 _ = AMOperationCombiner.run(type(of: innerRequest),
                                                                             key: "AMServiceProviderInnerRelogin",
