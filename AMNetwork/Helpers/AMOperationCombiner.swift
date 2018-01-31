@@ -12,15 +12,13 @@ public typealias RequestCompletion<T> = (T, Error?)->()
 
 public final class AMOperationCombiner {
     
-    private static let shared = AMOperationCombiner()
-    
     private var processingRequests: [String : [String : [AnyObject]]] = [:]
     
-    public class func run<T>(_ type: T.Type, key: String?, completion: RequestCompletion<T>?, progress: RequestProgress?, closure: (@escaping RequestCompletion<T>, @escaping RequestProgress) -> AnyObject?) -> AnyObject? {
+    public func run<T>(_ type: T.Type, key: String?, completion: RequestCompletion<T>?, progress: RequestProgress?, closure: (@escaping RequestCompletion<T>, @escaping RequestProgress) -> AnyObject?) -> AnyObject? {
         
         if let key = key {
         
-            var dict = self.shared.processingRequests[key]
+            var dict = processingRequests[key]
             
             var wrappedCompletion: ((Any, Error?)->())?
             
@@ -33,29 +31,29 @@ public final class AMOperationCombiner {
             if var dict = dict {
                 insertBlock(block: wrappedCompletion as AnyObject?, dict: &dict, key: "completion")
                 insertBlock(block: progress as AnyObject?, dict: &dict , key: "progress")
-                self.shared.processingRequests[key] = dict
+                processingRequests[key] = dict
                 return dict["operation"]?.first
             }
             
             dict = [:]
             insertBlock(block: wrappedCompletion as AnyObject?, dict: &dict!, key: "completion")
             insertBlock(block: progress as AnyObject?, dict: &dict!, key: "progress")
-            self.shared.processingRequests[key] = dict
+            processingRequests[key] = dict
             
             let operation = closure({ (object, error) in
                 
-                if let dict = shared.processingRequests[key], let blocks = dict["completion"] {
+                if let dict = self.processingRequests[key], let blocks = dict["completion"] {
                     blocks.forEach {
                         if let block = $0 as? (Any, Error?)->() {
                             block(object, error)
                         }
                     }
-                    shared.processingRequests[key] = nil
+                    self.processingRequests[key] = nil
                 }
                 
             }) { (progress) in
                 
-                if let dict = shared.processingRequests[key], let blocks = dict["progress"] {
+                if let dict = self.processingRequests[key], let blocks = dict["progress"] {
                     blocks.forEach { (object) in
                         if let block = object as? RequestProgress {
                             block(progress)
@@ -64,8 +62,9 @@ public final class AMOperationCombiner {
                 }
             }
             
-            if let oper = operation {
-                dict!["operation"] = [oper]
+            if let oper = operation, var dict = processingRequests[key] {
+                dict["operation"] = [oper]
+                processingRequests[key] = dict
             }
             
             return operation
@@ -78,7 +77,7 @@ public final class AMOperationCombiner {
         }
     }
     
-    private class func insertBlock(block: AnyObject?, dict: inout [String : [AnyObject]], key: String) {
+    private func insertBlock(block: AnyObject?, dict: inout [String : [AnyObject]], key: String) {
         var blocks = dict[key] ?? []
         
         if let block = block {

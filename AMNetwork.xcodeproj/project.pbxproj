@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D705D5F520222756007F5FE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D705D5F420222756007F5FE2 /* AppDelegate.swift */; };
+		D705D5FF20222756007F5FE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D705D5FD20222756007F5FE2 /* LaunchScreen.storyboard */; };
+		D705D60E20223283007F5FE2 /* AMOperationCombinerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D705D60D20223283007F5FE2 /* AMOperationCombinerTests.swift */; };
 		D775A8241FD9507B00786AA0 /* Collection+PrettyPrinted.swift in Sources */ = {isa = PBXBuildFile; fileRef = D775A8231FD9507B00786AA0 /* Collection+PrettyPrinted.swift */; };
 		D79499521FC480F2000D2C4F /* AMNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D79499481FC480F2000D2C4F /* AMNetwork.framework */; };
 		D79499571FC480F2000D2C4F /* AMNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D79499561FC480F2000D2C4F /* AMNetworkTests.swift */; };
@@ -24,6 +27,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		D705D60B20222775007F5FE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D794993F1FC480F2000D2C4F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D705D5F120222756007F5FE2;
+			remoteInfo = AMNetworkTestsHost;
+		};
 		D79499531FC480F2000D2C4F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D794993F1FC480F2000D2C4F /* Project object */;
@@ -83,6 +93,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D705D5F220222756007F5FE2 /* AMNetworkTestsHost.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AMNetworkTestsHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D705D5F420222756007F5FE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D705D5FE20222756007F5FE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D705D60020222756007F5FE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D705D60D20223283007F5FE2 /* AMOperationCombinerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AMOperationCombinerTests.swift; sourceTree = "<group>"; };
 		D775A8231FD9507B00786AA0 /* Collection+PrettyPrinted.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+PrettyPrinted.swift"; sourceTree = "<group>"; };
 		D79499481FC480F2000D2C4F /* AMNetwork.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AMNetwork.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D794994B1FC480F2000D2C4F /* AMNetwork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AMNetwork.h; sourceTree = "<group>"; };
@@ -103,6 +118,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D705D5EF20222756007F5FE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D79499441FC480F2000D2C4F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -122,11 +144,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D705D5F320222756007F5FE2 /* AMNetworkTestsHost */ = {
+			isa = PBXGroup;
+			children = (
+				D705D5F420222756007F5FE2 /* AppDelegate.swift */,
+				D705D5FD20222756007F5FE2 /* LaunchScreen.storyboard */,
+				D705D60020222756007F5FE2 /* Info.plist */,
+			);
+			path = AMNetworkTestsHost;
+			sourceTree = "<group>";
+		};
 		D794993E1FC480F2000D2C4F = {
 			isa = PBXGroup;
 			children = (
 				D794994A1FC480F2000D2C4F /* AMNetwork */,
 				D79499551FC480F2000D2C4F /* AMNetworkTests */,
+				D705D5F320222756007F5FE2 /* AMNetworkTestsHost */,
 				D7CB5CC91FE5ABC000341E60 /* Frameworks */,
 				D79499491FC480F2000D2C4F /* Products */,
 			);
@@ -137,6 +170,7 @@
 			children = (
 				D79499481FC480F2000D2C4F /* AMNetwork.framework */,
 				D79499511FC480F2000D2C4F /* AMNetworkTests.xctest */,
+				D705D5F220222756007F5FE2 /* AMNetworkTestsHost.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -159,6 +193,7 @@
 		D79499551FC480F2000D2C4F /* AMNetworkTests */ = {
 			isa = PBXGroup;
 			children = (
+				D705D60D20223283007F5FE2 /* AMOperationCombinerTests.swift */,
 				D79499561FC480F2000D2C4F /* AMNetworkTests.swift */,
 				D79499581FC480F2000D2C4F /* Info.plist */,
 			);
@@ -213,6 +248,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		D705D5F120222756007F5FE2 /* AMNetworkTestsHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D705D60A20222756007F5FE2 /* Build configuration list for PBXNativeTarget "AMNetworkTestsHost" */;
+			buildPhases = (
+				D705D5EE20222756007F5FE2 /* Sources */,
+				D705D5EF20222756007F5FE2 /* Frameworks */,
+				D705D5F020222756007F5FE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AMNetworkTestsHost;
+			productName = AMNetworkTestsHost;
+			productReference = D705D5F220222756007F5FE2 /* AMNetworkTestsHost.app */;
+			productType = "com.apple.product-type.application";
+		};
 		D79499471FC480F2000D2C4F /* AMNetwork */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D794995C1FC480F2000D2C4F /* Build configuration list for PBXNativeTarget "AMNetwork" */;
@@ -242,6 +294,7 @@
 			);
 			dependencies = (
 				D79499541FC480F2000D2C4F /* PBXTargetDependency */,
+				D705D60C20222775007F5FE2 /* PBXTargetDependency */,
 			);
 			name = AMNetworkTests;
 			productName = AMNetworkTests;
@@ -254,10 +307,14 @@
 		D794993F1FC480F2000D2C4F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0910;
+				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Ilya Kuznetsov";
 				TargetAttributes = {
+					D705D5F120222756007F5FE2 = {
+						CreatedOnToolsVersion = 9.2;
+						ProvisioningStyle = Automatic;
+					};
 					D79499471FC480F2000D2C4F = {
 						CreatedOnToolsVersion = 9.1;
 						LastSwiftMigration = 0910;
@@ -265,7 +322,8 @@
 					};
 					D79499501FC480F2000D2C4F = {
 						CreatedOnToolsVersion = 9.1;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
+						TestTargetID = D705D5F120222756007F5FE2;
 					};
 				};
 			};
@@ -275,6 +333,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = D794993E1FC480F2000D2C4F;
 			productRefGroup = D79499491FC480F2000D2C4F /* Products */;
@@ -289,6 +348,7 @@
 			targets = (
 				D79499471FC480F2000D2C4F /* AMNetwork */,
 				D79499501FC480F2000D2C4F /* AMNetworkTests */,
+				D705D5F120222756007F5FE2 /* AMNetworkTestsHost */,
 			);
 		};
 /* End PBXProject section */
@@ -346,6 +406,14 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		D705D5F020222756007F5FE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D705D5FF20222756007F5FE2 /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D794994F1FC480F2000D2C4F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -356,6 +424,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D705D5EE20222756007F5FE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D705D5F520222756007F5FE2 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D79499431FC480F2000D2C4F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -377,6 +453,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D705D60E20223283007F5FE2 /* AMOperationCombinerTests.swift in Sources */,
 				D79499571FC480F2000D2C4F /* AMNetworkTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -384,6 +461,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		D705D60C20222775007F5FE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D705D5F120222756007F5FE2 /* AMNetworkTestsHost */;
+			targetProxy = D705D60B20222775007F5FE2 /* PBXContainerItemProxy */;
+		};
 		D79499541FC480F2000D2C4F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D79499471FC480F2000D2C4F /* AMNetwork */;
@@ -391,7 +473,48 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		D705D5FD20222756007F5FE2 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D705D5FE20222756007F5FE2 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		D705D60120222756007F5FE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = AMNetworkTestsHost/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = ilyakuznetsov.AMNetworkTestsHost;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D705D60220222756007F5FE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = AMNetworkTestsHost/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = ilyakuznetsov.AMNetworkTestsHost;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		D794995A1FC480F2000D2C4F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -554,13 +677,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AMNetworkTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ilyakuznetsov.AMNetworkTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AMNetworkTestsHost.app/AMNetworkTestsHost";
 			};
 			name = Debug;
 		};
@@ -568,19 +694,31 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AMNetworkTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ilyakuznetsov.AMNetworkTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AMNetworkTestsHost.app/AMNetworkTestsHost";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D705D60A20222756007F5FE2 /* Build configuration list for PBXNativeTarget "AMNetworkTestsHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D705D60120222756007F5FE2 /* Debug */,
+				D705D60220222756007F5FE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D79499421FC480F2000D2C4F /* Build configuration list for PBXProject "AMNetwork" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

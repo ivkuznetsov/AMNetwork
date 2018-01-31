@@ -20,6 +20,7 @@ public typealias RequestProgress = (Double) -> ()
     @objc public var enabledLogging: Bool = true
     
     private var loginProcess: ((@escaping ProcessLogin)->())?
+    private var combiner = AMOperationCombiner()
     
     @objc public init(baseURL url: URL,
                         loginProcess: ((@escaping (Error?)->())->())?,
@@ -100,37 +101,37 @@ fileprivate extension AMServiceProvider {
     }
     
     func internalSend<T: AMServiceRequest>(_ originalRequest: T, progress: RequestProgress?, completion: ((T, Error?)->())?) -> URLSessionTask? {
-        return AMOperationCombiner.run(type(of: originalRequest),
-                                       key: originalRequest.reusing()?.reuseId(),
-                                       completion: completion,
-                                       progress: progress) { (completion, progress) -> AnyObject? in
+        return combiner.run(type(of: originalRequest),
+                            key: originalRequest.reusing()?.reuseId(),
+                            completion: completion,
+                            progress: progress) { (completion, progress) -> AnyObject? in
+                                
+                                return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
+                                    
+                                    if let error = error as? AMRequestError, let loginProcess = self.loginProcess, self.isFailedAuthorization(innerRequest, error: error) && originalRequest.canAskLogin() {
                                         
-                                        return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
-                                            
-                                            if let error = error as? AMRequestError, let loginProcess = self.loginProcess, self.isFailedAuthorization(innerRequest, error: error) && originalRequest.canAskLogin() {
-                                                
-                                                _ = AMOperationCombiner.run(type(of: innerRequest),
-                                                                            key: "AMServiceProviderInnerRelogin",
-                                                                            completion: { (request, error) in
-                                                                                
-                                                                                if error == nil {
-                                                                                    _ = self.enque(innerRequest, progress: progress, completion: completion)
-                                                                                } else {
-                                                                                    completion(innerRequest, error)
-                                                                                }
-                                                                                
-                                                }, progress: nil) { (completion, _) -> AnyObject? in
-                                                    loginProcess({ (error) in
-                                                        completion(innerRequest, error)
-                                                    })
-                                                    return nil
-                                                }
-                                                
-                                            } else {
+                                        _ = self.combiner.run(type(of: innerRequest),
+                                                              key: "AMServiceProviderInnerRelogin",
+                                                              completion: { (request, error) in
+                                                                
+                                                                if error == nil {
+                                                                    _ = self.enque(innerRequest, progress: progress, completion: completion)
+                                                                } else {
+                                                                    completion(innerRequest, error)
+                                                                }
+                                                                
+                                        }, progress: nil) { (completion, _) -> AnyObject? in
+                                            loginProcess({ (error) in
                                                 completion(innerRequest, error)
-                                            }
-                                        })
-        } as? URLSessionTask
+                                            })
+                                            return nil
+                                        }
+                                        
+                                    } else {
+                                        completion(innerRequest, error)
+                                    }
+                                })
+            } as? URLSessionTask
     }
     
     func requestFor(_ serviceRequest: AMServiceRequest) throws -> NSMutableURLRequest {
@@ -160,7 +161,7 @@ fileprivate extension AMServiceProvider {
             
         } else {
             request = requestSerializer.request(withMethod: serviceRequest.method(),
-                                                urlString: URL(string:serviceRequest.path(), relativeTo:baseURL!)!.absoluteString,
+                                                urlString: (URL(string:serviceRequest.path(), relativeTo:baseURL!) ?? baseURL!).absoluteString,
                                                 parameters: serviceRequest.requestDictionary(),
                                                 error: &error)
         }
