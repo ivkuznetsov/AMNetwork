@@ -254,37 +254,39 @@ fileprivate extension AMServiceProvider {
     
     func process<T: AMServiceRequest>(response: HTTPURLResponse, object: Any?, error: Error?, request: T, completion: @escaping (T, Error?)->()) {
         
-        log(message: "response code: \(response.statusCode)")
-        log(message: "response headers: \(response.allHeaderFields.json())")
-        
-        var resultError = error
-        
-        if let converting = request.errorConverting(), resultError == nil {
-            resultError = converting.validate(response: object, httpResponse: response)
-        }
-        
-        if let mime = response.mimeType, mime.hasPrefix("application") || mime.hasPrefix("text") {
-            if let object = object as? [AnyHashable : Any] {
-                log(message: "Response body: \(object.json())")
-            } else if let object = object as? [Any] {
-                log(message: "Response body: \(object.json())")
-            } else if let object = object as? Data {
-                log(message: "Response body: \(String(data:object, encoding:String.Encoding(rawValue: requestSerializer.stringEncoding)) ?? "Cannot parse body")")
-            }
-        }
-        
-        if let error = resultError {
-            log(message: "request error: \(error.localizedDescription)")
-            
-            if let converting = request.errorConverting() {
-                resultError = converting.convert(responseError: error)
-            }
-            
-            completion(request, resultError)
-            return
-        }
-        
         DispatchQueue.global(qos: .default).async {
+        
+            self.log(message: "response code: \(response.statusCode)")
+            self.log(message: "response headers: \(response.allHeaderFields.json())")
+            
+            var resultError = error
+            
+            if let converting = request.errorConverting(), resultError == nil {
+                resultError = converting.validate(response: object, httpResponse: response)
+            }
+            
+            if let mime = response.mimeType, mime.hasPrefix("application") || mime.hasPrefix("text") {
+                if let object = object as? [AnyHashable : Any] {
+                    self.log(message: "Response body: \(object.json())")
+                } else if let object = object as? [Any] {
+                    self.log(message: "Response body: \(object.json())")
+                } else if let object = object as? Data {
+                    self.log(message: "Response body: \(String(data:object, encoding:String.Encoding(rawValue: self.requestSerializer.stringEncoding)) ?? "Cannot parse body")")
+                }
+            }
+            
+            if let error = resultError {
+                self.log(message: "request error: \(error.localizedDescription)")
+                
+                if let converting = request.errorConverting() {
+                    resultError = converting.convert(responseError: error)
+                }
+                
+                DispatchQueue.main.async {
+                    completion(request, resultError)
+                }
+                return
+            }
             
             var validObject = object
             
