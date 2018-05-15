@@ -10,6 +10,30 @@ import Foundation
 
 public typealias RequestCompletion<T> = (T, Error?)->()
 
+private class CompletionWrapper<T> {
+    var completion: (T, Error?)->()
+    
+    init?(completion: ((T, Error?)->())?) {
+        if let completion = completion {
+            self.completion = completion
+        } else {
+            return nil
+        }
+    }
+}
+
+private class ProgressWrapper {
+    var progress: (Double)->()
+    
+    init?(progress: ((Double)->())?) {
+        if let progress = progress {
+            self.progress = progress
+        } else {
+            return nil
+        }
+    }
+}
+
 public final class AMOperationCombiner {
     
     private var processingRequests: [String : [String : [AnyObject]]] = [:]
@@ -20,32 +44,27 @@ public final class AMOperationCombiner {
         
             var dict = processingRequests[key]
             
-            var wrappedCompletion: ((Any, Error?)->())?
-            
-            if let completion = completion {
-                wrappedCompletion = { (request, error) in
-                    completion(request as! T, error)
-                }
-            }
+            let completionWrapper = CompletionWrapper<T>(completion: completion)
+            let progressWrapper = ProgressWrapper(progress: progress)
             
             if var dict = dict {
-                insertBlock(block: wrappedCompletion as AnyObject?, dict: &dict, key: "completion")
-                insertBlock(block: progress as AnyObject?, dict: &dict , key: "progress")
+                insertBlock(block: completionWrapper, dict: &dict, key: "completion")
+                insertBlock(block: progressWrapper, dict: &dict , key: "progress")
                 processingRequests[key] = dict
                 return dict["operation"]?.first
             }
             
             dict = [:]
-            insertBlock(block: wrappedCompletion as AnyObject?, dict: &dict!, key: "completion")
-            insertBlock(block: progress as AnyObject?, dict: &dict!, key: "progress")
+            insertBlock(block: completionWrapper, dict: &dict!, key: "completion")
+            insertBlock(block: progressWrapper, dict: &dict!, key: "progress")
             processingRequests[key] = dict
             
             let operation = closure({ (object, error) in
                 
                 if let dict = self.processingRequests[key], let blocks = dict["completion"] {
                     blocks.forEach {
-                        if let block = $0 as? (Any, Error?)->() {
-                            block(object, error)
+                        if let block = $0 as? CompletionWrapper<T> {
+                            block.completion(object, error)
                         }
                     }
                     self.processingRequests[key] = nil
@@ -55,8 +74,8 @@ public final class AMOperationCombiner {
                 
                 if let dict = self.processingRequests[key], let blocks = dict["progress"] {
                     blocks.forEach { (object) in
-                        if let block = object as? RequestProgress {
-                            block(progress)
+                        if let block = object as? ProgressWrapper {
+                            block.progress(progress)
                         }
                     }
                 }
