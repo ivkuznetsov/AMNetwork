@@ -10,6 +10,7 @@ import Foundation
 
 @objc public protocol AMFileRequest: AMServiceRequest {
     
+    //destination for download, source for upload
     func filePath() -> String?
     
     //if filePath returns nil, all data should be here

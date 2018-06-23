@@ -18,13 +18,13 @@ open class AMBaseFileRequest: AMBaseRequest, AMFileRequest {
     }
 }
 
-extension AMBaseFileRequest: AMFileUpload {
+open class AMBaseFileUploadRequest: AMBaseFileRequest, AMFileUpload {
     
-    public func mimeType() -> String {
+    open func mimeType() -> String {
         return "application/octet-stream"
     }
     
-    public func formFileField() -> String {
+    open func formFileField() -> String {
         return "data[file]"
     }
 }
