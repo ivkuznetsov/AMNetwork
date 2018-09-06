@@ -108,13 +108,21 @@ fileprivate extension AMServiceProvider {
                                 
                                 return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
                                     
+                                    if let error = error as? AMRequestError, error.code == 401 {
+                                        print("request failed auth " + innerRequest.path())
+                                    }
+                                    
                                     if let error = error as? AMRequestError, let loginProcess = self.loginProcess, self.isFailedAuthorization(innerRequest, error: error) && originalRequest.canAskLogin() {
                                         
-                                        _ = self.combiner.run(type(of: innerRequest),
+                                        print("request failed auth but inserted to queue" + innerRequest.path())
+                                        
+                                        _ = self.combiner.run(AMServiceRequest.self,
                                                               key: "AMServiceProviderInnerRelogin",
                                                               completion: { (request, error) in
                                                                 
                                                                 if error == nil {
+                                                                    print("retry request " + innerRequest.path())
+                                                                    
                                                                     _ = self.enque(innerRequest, progress: progress, completion: completion)
                                                                 } else {
                                                                     completion(innerRequest, error)
