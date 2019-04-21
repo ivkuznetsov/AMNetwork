@@ -75,15 +75,15 @@ public typealias RequestProgress = (Double) -> ()
 @available(swift, obsoleted: 1.0)
 public extension AMServiceProvider {
     
-    @objc public func send(_ request: AMServiceRequest, completion: @escaping (AMServiceRequest, Error?)->()) -> URLSessionDataTask? {
+    @objc func send(_ request: AMServiceRequest, completion: @escaping (AMServiceRequest, Error?)->()) -> URLSessionDataTask? {
         return sendWith(request, completion: completion)
     }
     
-    @objc public func uploadFile(_ request: AMFileUpload, progress: RequestProgress?, completion: ((AMFileUpload, Error?)->())?) -> URLSessionUploadTask? {
+    @objc func uploadFile(_ request: AMFileUpload, progress: RequestProgress?, completion: ((AMFileUpload, Error?)->())?) -> URLSessionUploadTask? {
         return upload(request, progress: progress, completion: completion)
     }
     
-    @objc public func downloadFile(_ request: AMFileRequest, progress: RequestProgress?, completion: ((AMFileRequest, Error?)->())?) -> URLSessionDownloadTask? {
+    @objc func downloadFile(_ request: AMFileRequest, progress: RequestProgress?, completion: ((AMFileRequest, Error?)->())?) -> URLSessionDownloadTask? {
         return download(request, progress: progress, completion: completion)
     }
 }

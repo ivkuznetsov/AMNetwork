@@ -10,7 +10,7 @@ import Foundation
 
 public extension Collection {
     
-    public func json() -> String {
+    func json() -> String {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted])
             guard let jsonString = String(data: jsonData, encoding: String.Encoding.utf8) else {
