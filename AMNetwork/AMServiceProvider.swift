@@ -19,6 +19,7 @@ public typealias RequestProgress = (Double) -> ()
     public var authorizationToken: String?
     @objc public var enabledLogging: Bool = true
     
+    public var authFailedCode = AMHTTPStatusCodes.HTTP_UNAUTORIZED.rawValue
     private var loginProcess: ((@escaping ProcessLogin)->())?
     private var combiner = AMOperationCombiner()
     
@@ -59,7 +60,7 @@ public typealias RequestProgress = (Double) -> ()
     
     // by default it checks error for 401 code
     open func isFailedAuthorization(_ request: AMServiceRequest, error: AMRequestError) -> Bool {
-        return error.code == AMHTTPStatusCodes.HTTP_UNAUTORIZED.rawValue
+        return error.code == authFailedCode
     }
     
     open func requestWillSend(_ request: NSMutableURLRequest, serviceRequest: AMServiceRequest) {
@@ -108,7 +109,7 @@ fileprivate extension AMServiceProvider {
                                 
                                 return enque(originalRequest, progress:progress, completion: { (innerRequest, error) in
                                     
-                                    if let error = error as? AMRequestError, error.code == 401 {
+                                    if let error = error as? AMRequestError, error.code == self.authFailedCode {
                                         print("request failed auth " + innerRequest.path())
                                     }
                                     
