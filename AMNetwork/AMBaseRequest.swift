@@ -60,7 +60,7 @@ extension AMBaseRequest: RequestErrorConverting {
         let acceptableCodes = IndexSet(integersIn: 200..<301)
         
         if !acceptableCodes.contains(httpResponse.statusCode) {
-            return AMRequestError(code: httpResponse.statusCode, description: "Some server error occured")
+            return AMRequestError(code: httpResponse.statusCode, description: "Some server error occurred")
         }
         return nil
     }
